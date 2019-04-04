@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<title>Three.js BisonPlains</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/87/three.min.js"></script>
+		<script src="../assets/OrbitControls.js"></script>
+		<script src="./assets/OBJLoader.js"></script>
+		<script src="./assets/MTLLoader.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+
+			var camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 0.5, 1000 );
+			camera.position.z = 50;
+			camera.position.x = 200;
+			camera.position.y = 200;
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var controls = new THREE.OrbitControls(camera, renderer.domElement);
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.25;
+			controls.enableZoom = true;
+
+			var keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(80, 50%, 80%)'), 0.5);
+			keyLight.position.set(-100, 0, 100);
+
+			var fillLight = new THREE.DirectionalLight(new THREE.Color( 0x444 ), 0.5);
+			fillLight.position.set(100, 0, 100);
+
+			var backLight = new THREE.DirectionalLight(0x0050, 0.5);
+			backLight.position.set(100, 0, -100).normalize();
+
+			scene.add(keyLight);
+			scene.add(fillLight);
+			scene.add(backLight);
+
+
+			// Loading the object and material files
+			var mtlLoader = new THREE.MTLLoader();
+			mtlLoader.setTexturePath('./assets/');
+			mtlLoader.setPath('./assets/');
+			mtlLoader.load('BisonPlains.mtl', function (materials) {
+
+				materials.preload();
+
+				var objLoader = new THREE.OBJLoader();
+				objLoader.setMaterials(materials);
+				objLoader.setPath('./assets/');
+				objLoader.load('BisonPlains.obj', function (object) {
+
+					scene.add(object);
+					object.position.y -= 10;
+
+				});
+
+			});
+
+			var animate = function () {
+				requestAnimationFrame( animate );
+				controls.update();
+				renderer.render(scene, camera);
+			};
+
+			animate();
+
+			// Change the background of the canvas of the model as required
+			renderer.setClearColor("#4DB251");
+		</script>
+	</body>
+</html>
